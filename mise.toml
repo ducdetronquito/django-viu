@@ -1,0 +1,13 @@
+[tools]
+poetry = "2.3"
+python = "3.14"
+
+[env]
+_.python.venv = { path = ".venv", create = false }
+
+[shell_alias]
+mr = "mise run"
+
+[tasks.test]
+description = "Run tests"
+run = "pytest"

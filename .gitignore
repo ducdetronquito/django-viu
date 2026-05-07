@@ -1,0 +1,11 @@
+# Dev env
+.env
+TODO.md
+
+# Python artifacts
+*.pyc
+__pycache__
+.venv
+
+# Pytest
+.pytest_cache

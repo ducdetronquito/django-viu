@@ -1,0 +1,42 @@
+[[repos]]
+repo = "builtin"
+hooks = [
+    {
+        id = "trailing-whitespace",
+    },
+    {
+        id = "end-of-file-fixer",
+    },
+    {
+        id = "check-merge-conflict",
+    },
+    {
+        id = "check-toml",
+    },
+]
+
+[[repos]]
+repo = "local"
+hooks = [
+    {
+        id = "ruff-format",
+        name = "ruff-format",
+        language = "system",
+        entry = "poetry run ruff format",
+        files = "\\.py$",
+    },
+    {
+        id = "ruff-check",
+        name = "ruff-check",
+        language = "system",
+        entry = "poetry run ruff check",
+        files = "\\.py$",
+    },
+    {
+        id = "basedpyright",
+        name = "basedpyright",
+        language = "system",
+        entry = "poetry run basedpyright",
+        files = "\\.py$",
+    },
+]
