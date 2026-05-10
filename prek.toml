@@ -39,4 +39,12 @@ hooks = [
         entry = "poetry run basedpyright",
         files = "\\.py$",
     },
+    {
+        id = "tests",
+        name = "tests",
+        language = "system",
+        entry = "poetry run pytest",
+        always_run = true,
+        pass_filenames = false
+    },
 ]
