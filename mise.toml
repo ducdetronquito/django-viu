@@ -8,6 +8,11 @@ _.python.venv = { path = ".venv", create = false }
 [shell_alias]
 mr = "mise run"
 
+
+[tasks.check]
+description = "Run all checks"
+run = "prek run --all-files"
+
 [tasks.test]
 description = "Run tests"
 run = "pytest"
