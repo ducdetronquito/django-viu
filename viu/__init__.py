@@ -104,7 +104,7 @@ class Router:
                 inputs = dict[str, Any]()
                 for argument_name, _ in annotations.items():
                     inputs[argument_name] = extractors[argument_name].from_request(request)
-                return viu(**inputs)
+                return viu(*args, **inputs)
 
             _path = path.removeprefix("/")
             self._views.append(django_path(_path, django_view))
