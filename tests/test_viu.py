@@ -47,8 +47,13 @@ def post_json(payload: Json[Payload]) -> JsonResponse:
     return JsonResponse({"name": payload.name, "age": payload.age}, status=200)
 
 
-@router.route(methods={"GET", "POST"}, path="/route")
+@router.route(path="/route")
 def get_from_route() -> JsonResponse:
+    return JsonResponse({}, status=200)
+
+
+@router.route(path="/route-with-method-restrictions", methods={"GET"})
+def get_from_route_for_all_methods() -> JsonResponse:
     return JsonResponse({}, status=200)
 
 
@@ -77,6 +82,19 @@ class TestRouter(SimpleTestCase):
         assert response.json() == {}
 
         response = Client().patch("/route")
+        assert response.status_code == HTTPStatus.OK
+        assert response.json() == {}
+
+    def test_route_with_method_restrictions(self):
+        response = Client().get("/route-with-method-restrictions")
+        assert response.status_code == HTTPStatus.OK
+        assert response.json() == {}
+
+        response = Client().post("/route-with-method-restrictions")
+        assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
+        assert response.json() == {}
+
+        response = Client().patch("/route-with-method-restrictions")
         assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
         assert response.json() == {}
 

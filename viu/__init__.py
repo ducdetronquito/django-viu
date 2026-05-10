@@ -71,10 +71,8 @@ class Router:
     def post(self, path: str):
         return self.route(methods={"POST"}, path=path)
 
-    def route(self, methods: set[HttpMethod], path: str):
-        def wrapper[**P](
-            viu: Viu[P],
-        ) -> DjangoView:
+    def route(self, path: str, methods: set[HttpMethod] | None = None):
+        def wrapper[**P](viu: Viu[P]) -> DjangoView:
             print(viu.__name__)
             annotations = get_type_hints(viu, include_extras=True)
             _return_type = annotations.pop("return")
@@ -97,7 +95,7 @@ class Router:
                 print(f"\tType metadata =>{metadata}")
 
             def django_view(request: HttpRequest, *args: P.args, **kwargs: P.kwargs) -> HttpResponse:
-                if request.method not in methods:
+                if methods and request.method not in methods:
                     return JsonResponse({}, status=HTTPStatus.METHOD_NOT_ALLOWED)
 
                 assert isinstance(request, HttpRequest)
