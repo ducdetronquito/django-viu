@@ -28,27 +28,12 @@ files = [
 tests = ["mypy (>=1.14.0)", "pytest", "pytest-asyncio"]
 
 [[package]]
-name = "basedpyright"
-version = "1.39.3"
-description = "static type checking for Python (but based)"
-optional = false
-python-versions = ">=3.8"
-groups = ["dev"]
-files = [
-    {file = "basedpyright-1.39.3-py3-none-any.whl", hash = "sha256:aba760dc83307727554f936d6b4381caa14482f30dbc2173167710e217c1f7ab"},
-    {file = "basedpyright-1.39.3.tar.gz", hash = "sha256:2f794e6b5f4260fb89f614ca6cd23c6f305373bb6b50c4ed7794ff2ae647fb14"},
-]
-
-[package.dependencies]
-nodejs-wheel-binaries = ">=20.13.1"
-
-[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
-groups = ["ci", "dev"]
+groups = ["ci", "test"]
 markers = "sys_platform == \"win32\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
@@ -82,7 +67,7 @@ version = "0.24.0"
 description = "Type stubs for Django"
 optional = false
 python-versions = ">=3.10"
-groups = ["dev"]
+groups = ["tools"]
 files = [
     {file = "django_types-0.24.0-py3-none-any.whl", hash = "sha256:ddb478ca733e0dde5475118dd59ab340156980f9659fd92de2083326ae96100a"},
     {file = "django_types-0.24.0.tar.gz", hash = "sha256:af903de8b9ee963b7594459a7a20cb8eaaab176ae2b3244ecaa089e0c570b0d1"},
@@ -97,29 +82,10 @@ version = "2.3.0"
 description = "brain-dead simple config-ini parsing"
 optional = false
 python-versions = ">=3.10"
-groups = ["ci", "dev"]
+groups = ["ci", "test"]
 files = [
     {file = "iniconfig-2.3.0-py3-none-any.whl", hash = "sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12"},
     {file = "iniconfig-2.3.0.tar.gz", hash = "sha256:c76315c77db068650d49c5b56314774a7804df16fee4402c1f19d6d15d8c4730"},
-]
-
-[[package]]
-name = "nodejs-wheel-binaries"
-version = "24.15.0"
-description = "unoffical Node.js package"
-optional = false
-python-versions = ">=3.7"
-groups = ["dev"]
-files = [
-    {file = "nodejs_wheel_binaries-24.15.0-py2.py3-none-macosx_13_0_arm64.whl", hash = "sha256:a6232fa8b754220941f52388c8ead923f7c1c7fdf0ea0d98f657523bd9a81ef4"},
-    {file = "nodejs_wheel_binaries-24.15.0-py2.py3-none-macosx_13_0_x86_64.whl", hash = "sha256:001a6b62c69d9109c1738163cca00608dd2722e8663af59300054ea02610972d"},
-    {file = "nodejs_wheel_binaries-24.15.0-py2.py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:0fbc48765e60ed0ff30d43898dbf5cadbadf2e5f1e7f204afc2b01493b7ebce6"},
-    {file = "nodejs_wheel_binaries-24.15.0-py2.py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:20ee0536809795da8a4942fc1ab4cbdebbcaaf29383eab67ba8874268fb00008"},
-    {file = "nodejs_wheel_binaries-24.15.0-py2.py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:1fade6c214285e72472ca40a631e98ff36559671cd5eefc8bf009471d67f04b4"},
-    {file = "nodejs_wheel_binaries-24.15.0-py2.py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:3984cb8d87766567aee67a49743227ab40ede6f47734ec990ff90e50b74e7740"},
-    {file = "nodejs_wheel_binaries-24.15.0-py2.py3-none-win_amd64.whl", hash = "sha256:a437601956b532dcb3082046e6978e622733f90edc0932cbb9adb3bb97a16501"},
-    {file = "nodejs_wheel_binaries-24.15.0-py2.py3-none-win_arm64.whl", hash = "sha256:bdf4a431e08321a32efc604111c6f23941f87055d796a537e8c4110daecad23f"},
-    {file = "nodejs_wheel_binaries-24.15.0.tar.gz", hash = "sha256:b43f5c4f6e5768d8845b2ae4682eb703a19bf7aadc84187e2d903ed3a611c859"},
 ]
 
 [[package]]
@@ -128,7 +94,7 @@ version = "26.2"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
-groups = ["ci", "dev"]
+groups = ["ci", "test"]
 files = [
     {file = "packaging-26.2-py3-none-any.whl", hash = "sha256:5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e"},
     {file = "packaging-26.2.tar.gz", hash = "sha256:ff452ff5a3e828ce110190feff1178bb1f2ea2281fa2075aadb987c2fb221661"},
@@ -140,7 +106,7 @@ version = "1.6.0"
 description = "plugin and hook calling mechanisms for python"
 optional = false
 python-versions = ">=3.9"
-groups = ["ci", "dev"]
+groups = ["ci", "test"]
 files = [
     {file = "pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746"},
     {file = "pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3"},
@@ -156,7 +122,7 @@ version = "0.3.13"
 description = "A fast Git hook manager written in Rust, designed as a drop-in alternative to pre-commit, reimagined."
 optional = false
 python-versions = ">=3.8"
-groups = ["dev"]
+groups = ["tools"]
 files = [
     {file = "prek-0.3.13-py3-none-linux_armv6l.whl", hash = "sha256:b00d38f01235073c35aa5f48df57fefef45a6cec2ae0884d750345a2c7220370"},
     {file = "prek-0.3.13-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:0d89ac712c60e34d1550a606ad5fdfb8ad71d44ced8afa2fa5cbc106be4abd9e"},
@@ -338,7 +304,7 @@ version = "2.20.0"
 description = "Pygments is a syntax highlighting package written in Python."
 optional = false
 python-versions = ">=3.9"
-groups = ["ci", "dev"]
+groups = ["ci", "test"]
 files = [
     {file = "pygments-2.20.0-py3-none-any.whl", hash = "sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176"},
     {file = "pygments-2.20.0.tar.gz", hash = "sha256:6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f"},
@@ -348,12 +314,32 @@ files = [
 windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
+name = "pyrefly"
+version = "1.0.0"
+description = "A fast type checker and language server for Python with powerful IDE features"
+optional = false
+python-versions = ">=3.8"
+groups = ["tools"]
+files = [
+    {file = "pyrefly-1.0.0-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:e355a0908555348ed4b9585ef25c76ff566673e345c866c325f1633f44d890b6"},
+    {file = "pyrefly-1.0.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:a7038efc3a40f8294edee339895633cf22db268c0d434cdbcbefc34f78a9ecc3"},
+    {file = "pyrefly-1.0.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:da331ca515ed1c08791da2b5f664cf9c1294c48fd802133262e7d5d51e0f4416"},
+    {file = "pyrefly-1.0.0-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:c74219d8f3e63cdaa5501a0b21d1c9d37011820f9606728d0ed06f09ae86a878"},
+    {file = "pyrefly-1.0.0-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:c0d05543b1bb6ee6d64149eb5d6b2fb15aa72d3962d6a97abca0afaca8b0c131"},
+    {file = "pyrefly-1.0.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1382d5b1fcdb49a4de9f34d112d2bddf290a78ff93ee8149492ad5f1077ddffc"},
+    {file = "pyrefly-1.0.0-py3-none-win32.whl", hash = "sha256:aa8b5d0e47080e3202a2547b39f7a5a61d2c781c712b3b67884f745ca2c759d2"},
+    {file = "pyrefly-1.0.0-py3-none-win_amd64.whl", hash = "sha256:c8abcb0f2082e83c890375128f9cff4aa4d3f210b85eea7b3046c1ae764e77f5"},
+    {file = "pyrefly-1.0.0-py3-none-win_arm64.whl", hash = "sha256:d150fa9e40e8392832be81c3bcfc0497c146674ce4d0f8e04e1ec29e775ffb8c"},
+    {file = "pyrefly-1.0.0.tar.gz", hash = "sha256:5c2b810ffcebd84be71de5df1223651edee951653a66935c6f091e957c452455"},
+]
+
+[[package]]
 name = "pytest"
 version = "9.0.3"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.10"
-groups = ["ci", "dev"]
+groups = ["ci", "test"]
 files = [
     {file = "pytest-9.0.3-py3-none-any.whl", hash = "sha256:2c5efc453d45394fdd706ade797c0a81091eccd1d6e4bccfcd476e2b8e0ab5d9"},
     {file = "pytest-9.0.3.tar.gz", hash = "sha256:b86ada508af81d19edeb213c681b1d48246c1a91d304c6c81a427674c17eb91c"},
@@ -375,7 +361,7 @@ version = "4.12.0"
 description = "A Django plugin for pytest."
 optional = false
 python-versions = ">=3.10"
-groups = ["dev"]
+groups = ["test"]
 files = [
     {file = "pytest_django-4.12.0-py3-none-any.whl", hash = "sha256:3ff300c49f8350ba2953b90297d23bf5f589db69545f56f1ec5f8cff5da83e85"},
     {file = "pytest_django-4.12.0.tar.gz", hash = "sha256:df94ec819a83c8979c8f6de13d9cdfbe76e8c21d39473cfe2b40c9fc9be3c758"},
@@ -405,7 +391,7 @@ version = "0.15.12"
 description = "An extremely fast Python linter and code formatter, written in Rust."
 optional = false
 python-versions = ">=3.7"
-groups = ["dev"]
+groups = ["tools"]
 files = [
     {file = "ruff-0.15.12-py3-none-linux_armv6l.whl", hash = "sha256:f86f176e188e94d6bdbc09f09bfd9dc729059ad93d0e7390b5a73efe19f8861c"},
     {file = "ruff-0.15.12-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:e3bcd123364c3770b8e1b7baaf343cc99a35f197c5c6e8af79015c666c423a6c"},
@@ -449,7 +435,7 @@ version = "2.9.21.20260422"
 description = "Typing stubs for psycopg2"
 optional = false
 python-versions = ">=3.10"
-groups = ["dev"]
+groups = ["tools"]
 files = [
     {file = "types_psycopg2-2.9.21.20260422-py3-none-any.whl", hash = "sha256:e240684ac37946c5a2a058b04ea1f2fd0e4ee2655719b8c3ec9abf37f96da5ba"},
     {file = "types_psycopg2-2.9.21.20260422.tar.gz", hash = "sha256:ad7574fa8e25d9aa96ab96cd280c4dee20872725cd1fe6a6d3facc354f2644d4"},
@@ -498,4 +484,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.14"
-content-hash = "8fe49c85d7cf121f7ce1f08ef6b0896c675ecdb33a69fa8456407f005c5c7669"
+content-hash = "cf1a304f668f6c3ac7d282562ce05dea1742435e2391b8a8c2c335db8ceabb51"

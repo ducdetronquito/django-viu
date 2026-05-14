@@ -36,7 +36,7 @@ class PathExtractor[T: BaseModel]:
         resolver_match = request.resolver_match
         assert resolver_match is not None
         # NB: `captured_kwargs` is not defined as a ResolverMatch field in django-types
-        captured_kwargs = cast(dict[str, Any], resolver_match.captured_kwargs)  # pyright: ignore[reportAttributeAccessIssue]
+        captured_kwargs = cast(dict[str, Any], resolver_match.captured_kwargs)  # pyrefly: ignore[missing-attribute]
         return self.output_type.model_validate(captured_kwargs)
 
 
@@ -81,6 +81,7 @@ class Router:
             extractors = dict[str, Extractor[Any]]()
             for parameter_name, parameter_type in parameters_types.items():
                 alias = get_origin(parameter_type)
+                assert alias is not None
                 type_args = get_args(parameter_type)[0]
                 metadata = alias.__value__.__metadata__[0]
                 if metadata == "from-path-params":

@@ -2,10 +2,15 @@
   "languages": {
     "Python": {
       "format_on_save": "on",
-      "language_servers": [
-        "basedpyright",
-        "ruff"
-      ]
-    }
-  }
+      "language_servers": ["pyrefly", "ruff"],
+    },
+  },
+  "lsp": {
+    "pyrefly": {
+      "binary": {
+        "path": ".venv/bin/pyrefly",
+        "arguments": ["lsp"],
+      },
+    },
+  },
 }
