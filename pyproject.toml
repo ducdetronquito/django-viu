@@ -12,15 +12,17 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [
-    "basedpyright (>=1.39.3,<2.0.0)",
-    "django-types (>=0.24.0,<1.0.0)",
-    "ruff (>=0.15.12,<1.0.0)",
+test = [
     "pytest-django (>=4.12.0,<5.0.0)",
-    "prek (>=0.3.13,<0.4.0)"
 ]
 ci = [
     "pytest-github-actions-annotate-failures (>=0.4.0,<0.5.0)"
+]
+tools = [
+    "django-types (>=0.24.0,<1.0.0)",
+    "prek (>=0.3.13,<0.4.0)",
+    "pyrefly (>=1.0.0,<2.0.0)",
+    "ruff (>=0.15.12,<1.0.0)",
 ]
 
 [tool.poetry.group.ci]
@@ -31,17 +33,18 @@ optional = true
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.pyright]
-venvPath = "."
-venv = ".venv"
-typeCheckingMode = "strict"
-failOnWarnings = true
-deprecateTypingAliases = true
-
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 addopts = [
     "--import-mode=importlib"
 ]
+
 [tool.ruff]
 line-length = 120
+
+[tool.pyrefly]
+project-includes = ["viu", "tests"]
+search-path = ["viu"]
+infer-with-first-use = true
+min-severity = "info"
+preset = "strict"

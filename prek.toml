@@ -33,10 +33,10 @@ hooks = [
         files = "\\.py$",
     },
     {
-        id = "basedpyright",
-        name = "basedpyright",
+        id = "typechecker",
+        name = "typechecker",
         language = "system",
-        entry = "poetry run basedpyright",
+        entry = "poetry run pyrefly check",
         files = "\\.py$",
     },
     {

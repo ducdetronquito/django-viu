@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import override
 
 import pytest
 from django.http import JsonResponse
@@ -115,6 +116,7 @@ class TestRouter(SimpleTestCase):
 
 
 class TestQuery(SimpleTestCase):
+    @override
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
@@ -137,6 +139,7 @@ class TestQuery(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="tests.test_viu")
 class TestJson(SimpleTestCase):
+    @override
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()

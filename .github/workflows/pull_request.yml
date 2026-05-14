@@ -16,12 +16,12 @@ jobs:
       - name: Check pyproject.toml and lock file consistency
         run: poetry check
       - name: Install Python dependencies
-        run: poetry install --with dev,ci
+        run: poetry install --with ci
       - name: Run Linter
         run: poetry run ruff check --output-format=github
       - name: Run Formatter
         run: poetry run ruff format --check
       - name: Run Typechecker
-        run: poetry run basedpyright
+        run: poetry run pyrefly check
       - name: Run unit tests
         run: poetry run pytest
