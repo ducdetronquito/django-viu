@@ -73,6 +73,16 @@ class TestRouter(SimpleTestCase):
         assert response.status_code == HTTPStatus.OK
         assert response.json() == {}
 
+    def test_post_json(self):
+        response = Client().post(
+            "/post-json",
+            data={"name": "Averell", "age": 30},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"name": "Averell", "age": 30}
+
     def test_route(self):
         response = Client().get("/route")
         assert response.status_code == HTTPStatus.OK
