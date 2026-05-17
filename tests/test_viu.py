@@ -1,10 +1,11 @@
 from http import HTTPStatus
-from typing import override
+from typing import cast, override
 
 import pytest
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.test import Client, RequestFactory, SimpleTestCase, override_settings
 from django.urls import path
+from django.views import View
 from pydantic import BaseModel, ValidationError
 
 from viu import Json, Path, Query, Router
@@ -56,6 +57,15 @@ def get_from_route() -> JsonResponse:
 @router.route(path="/route-with-method-restrictions", methods={"GET"})
 def get_from_route_for_all_methods() -> JsonResponse:
     return JsonResponse({}, status=200)
+
+
+@router.route_view(path="/route-django-view")
+class SomeViu(View):
+    def get(self, params: Query[QueryParams]) -> JsonResponse:
+        return JsonResponse(status=200, data={"id": params.id, "name": params.name})
+
+    def post(self, payload: Json[Payload]) -> JsonResponse:
+        return JsonResponse({"name": payload.name, "age": payload.age}, status=200)
 
 
 urlpatterns = [path("", router.urls)]
@@ -123,6 +133,45 @@ class TestRouter(SimpleTestCase):
         # Cf:
         # - https://docs.djangoproject.com/en/5.2/topics/http/views/#the-http404-exception
         # - https://docs.djangoproject.com/en/5.2/topics/http/views/#customizing-error-views
+
+
+@override_settings(ROOT_URLCONF="tests.test_viu")
+class TestRouteView(SimpleTestCase):
+    def test_get(self):
+        response = Client().get("/route-django-view?id=2&name=joe")
+        assert response.status_code == HTTPStatus.OK
+        assert response.json() == {"id": 2, "name": "joe"}
+
+    def test_head_request_fallback_to_get_handler_when_its_not_defined(self):
+        # When head is not defined, use get handler
+        response = Client().head("/route-django-view?id=2&name=joe")
+        assert response.status_code == HTTPStatus.OK
+        assert response.content == b""
+
+    def test_post(self):
+        response = Client().post(
+            "/route-django-view",
+            data={"name": "Averell", "age": 30},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"name": "Averell", "age": 30}
+
+    def test_method_not_defined(self):
+        response = Client().delete("/route-django-view")
+        assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
+
+    def test_method_not_allowed(self):
+        response = cast(
+            HttpResponse, Client().generic("DOSTUFF", "/route-django-view")
+        )  # stubs defined the returned value to be a WSGIRequest
+        assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
+
+    def test_predefined_options(self):
+        response = Client().options("/route-django-view")
+        assert response.headers["Allow"] == "GET, POST, HEAD, OPTIONS"
+        assert response.headers["Content-Length"] == "0"
 
 
 class TestQuery(SimpleTestCase):

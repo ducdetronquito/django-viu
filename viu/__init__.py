@@ -16,6 +16,7 @@ from django.http.request import HttpRequest
 from django.http.response import JsonResponse
 from django.urls import URLPattern, URLResolver
 from django.urls import path as django_path
+from django.views import View
 from pydantic import BaseModel
 from typing_extensions import Any
 
@@ -60,6 +61,7 @@ type DjangoView = Callable[Concatenate[HttpRequest, ...], HttpResponse]
 type AnyHandler = Callable[..., HttpResponse]
 type HttpMethod = Literal["GET"] | Literal["POST"]
 type Extractors = dict[str, Extractor[BaseModel]]
+type DjangoViewClass = type[View]
 
 
 class Router:
@@ -94,6 +96,66 @@ class Router:
 
         return wrapper
 
+    def route_view(self, path: str):
+        def wrapper(viu: DjangoViewClass) -> DjangoViewClass:
+            print(viu.__name__)
+            extractors_per_method = dict[str, Extractors]()
+            for method_name in viu.http_method_names:
+                handler = cast(AnyHandler | None, getattr(viu, method_name, None))
+
+                # Mimic Django View's behaviour:
+                # Use the "get" handler when no "head" handler is defined
+                if method_name == "head" and handler is None:
+                    handler = cast(AnyHandler, getattr(viu, "get", None))
+
+                if handler is None:
+                    continue
+
+                # OPTIONS request handler is defined by Django's View. I don't know yet how to handle
+                # the case where a user override it with viu-style parameters injection.
+                if method_name == "options":
+                    continue
+
+                extractors = self._get_extractors(handler)
+                extractors_per_method[method_name.upper()] = extractors
+
+            setattr(viu, "_extractors_per_method", extractors_per_method)
+
+            def viu_dispatch(self: View, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+                # Mimic Django View's dispatch behaviour:
+                # Try to dispatch to the right method; if a method doesn't exist,
+                # defer to the error handler. Also defer to the error handler if the
+                # request method isn't on the approved list.
+
+                method = request.method.lower()  # pyrefly: ignore[missing-attribute] HttpRequest.method is not nullable in dispatch
+
+                if method not in self.http_method_names or (handler := getattr(self, method, None)) is None:
+                    return self.http_method_not_allowed(request, *args, **kwargs)
+
+                # OPTIONS request handler is defined by Django's View. I don't know yet how to handle
+                # the case where a user override it with viu-style parameters injection.
+                if method == "options":
+                    return handler(request, *args, **kwargs)
+
+                # HttpRequest.method is not None when the dispatch method is called
+                extractors = cast(Extractors, self._extractors_per_method[request.method])  # pyrefly: ignore[missing-attribute]
+                inputs = {
+                    argument_name: extractors[argument_name].from_request(request)
+                    for argument_name, extractor in extractors.items()
+                }
+                return handler(**inputs)
+
+            viu.dispatch = viu_dispatch
+            _path = path.removeprefix("/")
+            self._views.append(django_path(_path, viu.as_view()))
+            return viu
+
+        return wrapper
+
+    @property
+    def urls(self) -> tuple[list[URLResolver | URLPattern], str, str]:
+        return (self._views, "", "")
+
     def _get_extractors(self, handler: AnyHandler) -> Extractors:
         annotations = get_type_hints(handler, include_extras=True)
         _return_type = annotations.pop("return")
@@ -118,7 +180,3 @@ class Router:
             print(f"\tType metadata =>{metadata}")
 
         return extractors
-
-    @property
-    def urls(self) -> tuple[list[URLResolver | URLPattern], str, str]:
-        return (self._views, "", "")
