@@ -1,14 +1,17 @@
+import inspect
+from abc import ABC, abstractmethod
 from http import HTTPStatus
 from typing import (
     Annotated,
+    Any,
     Callable,
     Concatenate,
     Literal,
-    Protocol,
+    TypeAliasType,
     cast,
     get_args,
     get_origin,
-    get_type_hints,
+    override,
 )
 
 from django.http import HttpResponse
@@ -18,21 +21,19 @@ from django.urls import URLPattern, URLResolver
 from django.urls import path as django_path
 from django.views import View
 from pydantic import BaseModel
-from typing_extensions import Any
-
-type Path[T: BaseModel] = Annotated[T, "from-path-params"]
-type Query[T: BaseModel] = Annotated[T, "from-query-params"]
-type Json[T: BaseModel] = Annotated[T, "from-json-payload"]
 
 
-class Extractor[T](Protocol):
+class Extractor[T](ABC):
+    @abstractmethod
     def from_request(self, request: HttpRequest) -> T: ...
 
 
-class PathExtractor[T: BaseModel]:
+class PathExtractor[T: BaseModel](Extractor[T]):
     def __init__(self, output_type: type[T]) -> None:
+        assert issubclass(output_type, BaseModel)
         self.output_type = output_type
 
+    @override
     def from_request(self, request: HttpRequest) -> T:
         resolver_match = request.resolver_match
         assert resolver_match is not None
@@ -41,26 +42,46 @@ class PathExtractor[T: BaseModel]:
         return self.output_type.model_validate(captured_kwargs)
 
 
-class QueryExtractor[T: BaseModel]:
+class QueryParamsExtractor[T: BaseModel](Extractor[T]):
     def __init__(self, output_type: type[T]) -> None:
+        assert issubclass(output_type, BaseModel)
         self.output_type = output_type
 
+    @override
     def from_request(self, request: HttpRequest) -> T:
         return self.output_type(**request.GET.dict())
 
 
-class JsonExtractor[T: BaseModel]:
+class JsonPayloadExtractor[T: BaseModel](Extractor[T]):
     def __init__(self, output_type: type[T]) -> None:
+        assert issubclass(output_type, BaseModel)
         self.output_type = output_type
 
+    @override
     def from_request(self, request: HttpRequest) -> T:
         return self.output_type.model_validate_json(request.body)
 
 
+class RequestExtractor[T: HttpRequest](Extractor[T]):
+    def __init__(self, output_type: type[T]) -> None:
+        assert issubclass(output_type, HttpRequest)
+        self.output_type = output_type
+
+    @override
+    def from_request(self, request: HttpRequest) -> T:
+        assert isinstance(request, self.output_type)
+        return request
+
+
+type Path[T: BaseModel] = Annotated[T, PathExtractor[T]]
+type Query[T: BaseModel] = Annotated[T, QueryParamsExtractor[T]]
+type Json[T: BaseModel] = Annotated[T, JsonPayloadExtractor[T]]
+type Raw[T] = Annotated[HttpRequest, RequestExtractor[T]]
+
 type DjangoView = Callable[Concatenate[HttpRequest, ...], HttpResponse]
 type AnyHandler = Callable[..., HttpResponse]
 type HttpMethod = Literal["GET"] | Literal["POST"]
-type Extractors = dict[str, Extractor[BaseModel]]
+type Extractors = dict[str, Extractor[Any]]
 type DjangoViewClass = type[View]
 
 
@@ -157,26 +178,37 @@ class Router:
         return (self._views, "", "")
 
     def _get_extractors(self, handler: AnyHandler) -> Extractors:
-        annotations = get_type_hints(handler, include_extras=True)
-        _return_type = annotations.pop("return")
-        parameters_types = annotations
-
         extractors: Extractors = {}
-        for parameter_name, parameter_type in parameters_types.items():
-            alias = get_origin(parameter_type)
-            assert alias is not None
-            type_args = get_args(parameter_type)[0]
-            assert issubclass(type_args, BaseModel)
-            metadata = alias.__value__.__metadata__[0]
-            if metadata == "from-path-params":
-                extractors[parameter_name] = PathExtractor(type_args)
-            elif metadata == "from-query-params":
-                extractors[parameter_name] = QueryExtractor(type_args)
-            elif metadata == "from-json-payload":
-                extractors[parameter_name] = JsonExtractor(type_args)
-            print(f"\tArgument name => {parameter_name}")
-            print(f"\tType name     => {alias.__name__}")
-            print(f"\tType args     => {type_args}")
-            print(f"\tType metadata =>{metadata}")
+        signature = inspect.signature(handler)
+        for parameter_name, parameter in signature.parameters.items():
+            if parameter_name == "self":
+                continue
+
+            parameter_annotation = parameter.annotation
+            if parameter_name != "self" and parameter_annotation is inspect._empty:
+                raise Exception("Every parameter must have a type annotations")
+
+            origin = get_origin(parameter_annotation)
+            if isinstance(origin, TypeAliasType):
+                annotated_alias = origin.__value__
+            else:
+                breakpoint()
+                raise Exception("Unexpected type annotation A")
+
+            assert get_origin(annotated_alias) is Annotated
+            metadata = annotated_alias.__metadata__[0]
+
+            if (origin := get_origin(metadata)) is not None and issubclass(origin, Extractor):
+                extractor_class = origin
+            elif issubclass(metadata, Extractor):
+                extractor_class = metadata
+            else:
+                raise Exception("unexpected type annotation B")
+
+            extractor_class = cast(type[Extractor[Any]], extractor_class)
+
+            extractor_output_type = get_args(parameter_annotation)[0]
+
+            extractors[parameter_name] = extractor_class(extractor_output_type)  # pyrefly: ignore[bad-argument-count]
 
         return extractors

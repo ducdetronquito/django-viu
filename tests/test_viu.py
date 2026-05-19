@@ -2,13 +2,13 @@ from http import HTTPStatus
 from typing import cast, override
 
 import pytest
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.test import Client, RequestFactory, SimpleTestCase, override_settings
 from django.urls import path
 from django.views import View
 from pydantic import BaseModel, ValidationError
 
-from viu import Json, Path, Query, Router
+from viu import Json, Path, Query, Raw, Router
 
 
 class QueryParams(BaseModel):
@@ -56,6 +56,12 @@ def get_from_route() -> JsonResponse:
 
 @router.route(path="/route-with-method-restrictions", methods={"GET"})
 def get_from_route_for_all_methods() -> JsonResponse:
+    return JsonResponse({}, status=200)
+
+
+@router.get("/raw-request")
+def get_raw_request(request: Raw[HttpRequest]) -> JsonResponse:
+    assert isinstance(request, HttpRequest)
     return JsonResponse({}, status=200)
 
 
@@ -225,3 +231,20 @@ class TestJson(SimpleTestCase):
 
         with pytest.raises(ValidationError):
             post_json(request)
+
+
+@override_settings(ROOT_URLCONF="tests.test_viu")
+class TestExtractRequest(SimpleTestCase):
+    @override
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        cls.request_factory = RequestFactory()
+
+    def test_works(self):
+        request = self.request_factory.get("/raw-request")
+
+        response = get_raw_request(request)
+
+        assert response.status_code == 200
+        assert response.content == b"{}"
